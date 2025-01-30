@@ -39,3 +39,25 @@
 ✅ **Desplegar la aplicación en un servidor permanente.**
 
 🚀 **Listo para subir los cambios a GitHub!** 😃
+
+### 📌 Bitácora - 30/01/2025  
+
+#### **Actividad: Conexión y registro exitoso desde dispositivos móviles**  
+
+**Descripción:**  
+Se logró la conexión y el registro exitoso desde dispositivos móviles accediendo a la aplicación web.  
+
+#### **Cambios realizados:**  
+✅ Se configuró Flask para aceptar conexiones desde la red WiFi local.  
+✅ Se ajustó el firewall de Windows para permitir tráfico en el puerto 5000.  
+✅ Se corrigió la configuración de `CORS` en Flask para permitir peticiones externas.  
+✅ Se verificó y corrigió la carga de archivos estáticos (`styles.css` y `script.js`).  
+✅ Se realizaron pruebas desde un dispositivo móvil, validando que los datos se almacenan correctamente en la base de datos MySQL y se muestran en la tabla de la aplicación web.  
+
+#### **Próximos pasos:**  
+- Optimizar la interfaz para mejorar la experiencia en dispositivos móviles.  
+- Implementar opciones de edición y eliminación de registros en la tabla.  
+- Crear copias de seguridad automáticas de la base de datos.  
+
+**Estado del proyecto:** ✔️ **Funcional y operativo en red local.**  
+
