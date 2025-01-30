@@ -1,23 +1,35 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import mysql.connector
 from mysql.connector import Error
 import json
 import sys
 from flask_cors import CORS
+import os  # Para manejar rutas de archivos
 
 # Asegurar que todo maneje UTF-8
 sys.stdout.reconfigure(encoding='utf-8')
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../frontend')
 CORS(app)  # Habilitar CORS para permitir peticiones desde el frontend
+
+# Servir archivos estáticos correctamente
+@app.route('/<path:filename>')
+def static_files(filename):
+    return send_from_directory(app.static_folder, filename)
 
 # Configuración de la conexión a MySQL
 DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
     'password': '042485',
-    'database': 'iglesia'
+    'database': 'iglesia',
+    'charset': 'utf8mb4'  # Asegurar codificación UTF-8
 }
+
+# Ruta para servir la página principal
+@app.route('/')
+def index():
+    return send_from_directory(app.static_folder, 'index.html')
 
 # Ruta para recibir datos del formulario y guardarlos en MySQL
 @app.route('/registrar', methods=['POST'])
@@ -61,7 +73,7 @@ def registrar_membresia():
         print("Error en MySQL:", str(e))
         return jsonify({"error": str(e)}), 500
 
-# Ruta para obtener la lista de miembros
+# Ruta para obtener la lista de miembros con codificación UTF-8
 @app.route('/miembros', methods=['GET'])
 def obtener_miembros():
     try:
@@ -79,3 +91,4 @@ def obtener_miembros():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+

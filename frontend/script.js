@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
             experiencia_refam: experienciaRefam
         };
 
-        fetch("http://192.168.91.226:5000/registrar", {
+        fetch("http://192.168.1.11:5000/registrar", {
             
             method: "POST",
             headers: {
@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function cargarMiembros() {
-        fetch("http://192.168.91.226:5000/miembros")
+        fetch("http://192.168.1.11:5000/miembros") 
         .then(response => response.json())
         .then(data => {
             tablaMiembros.innerHTML = "";
