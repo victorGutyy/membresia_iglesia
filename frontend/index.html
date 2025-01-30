@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Membresía</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Formulario de Registro Lideres y Auxiliares REFAM IPUC 4TA Calarca</h2>
+        <form id="membresia-form">
+            <label for="nombre_completo">Nombre Completo:</label>
+            <input type="text" id="nombre_completo" name="nombre_completo" required>
+
+            <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
+            <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+
+            <label for="direccion">Dirección:</label>
+            <input type="text" id="direccion" name="direccion" required>
+
+            <label for="telefono">Teléfono:</label>
+            <input type="tel" id="telefono" name="telefono" required>
+
+            <label for="correo_electronico">Correo Electrónico:</label>
+            <input type="email" id="correo_electronico" name="correo_electronico" required>
+
+            <label for="tiempo_bautizado">Tiempo de Bautizado:</label>
+            <input type="text" id="tiempo_bautizado" name="tiempo_bautizado" required>
+
+            <label for="promesado">¿Es Promesado?</label>
+            <select id="promesado" name="promesado" required>
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+            </select>
+
+            <label for="experiencia_refam">Experiencia en REFAM:</label>
+            <textarea id="experiencia_refam" name="experiencia_refam" rows="4"></textarea>
+
+            <button type="submit">Registrar</button>
+        </form>
+
+        <h2>Lista de Miembros Registrados</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Fecha de Nacimiento</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th>Correo Electrónico</th>
+                    <th>Tiempo de Bautizado</th>
+                    <th>Promesado</th>
+                    <th>Experiencia en REFAM</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-miembros">
+                <!-- Aquí se cargarán los registros -->
+            </tbody>
+        </table>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
