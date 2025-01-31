@@ -61,3 +61,27 @@ Se logró la conexión y el registro exitoso desde dispositivos móviles accedie
 
 **Estado del proyecto:** ✔️ **Funcional y operativo en red local.**  
 
+📅 Fecha: 31 de enero de 2025
+🛠️ Actividades realizadas:
+
+1️⃣ Corrección y mejora del formulario de registro de miembros
+
+Se solucionaron problemas de conexión en la red WiFi.
+Se ajustaron los estilos CSS para una mejor visualización en dispositivos móviles y pantallas grandes.
+2️⃣ Implementación de acciones en la tabla de miembros
+
+Se agregó la opción de "Editar" registros.
+Se agregó la opción de "Eliminar" registros.
+Se ajustó la carga de datos para que la tabla refleje los cambios en tiempo real.
+3️⃣ Corrección de errores en la codificación UTF-8
+
+Se aseguraron los caracteres especiales en MySQL y en la visualización en el frontend.
+4️⃣ Pruebas exitosas en diferentes dispositivos y navegadores
+
+Se verificó el acceso desde computadoras y celulares conectados a la misma red.
+Se validó que los registros se almacenan correctamente en la base de datos y se muestran en la tabla.
+5️⃣ Subida de cambios al repositorio GitHub
+
+Se actualizaron los archivos del frontend (index.html, styles.css, script.js).
+Se actualizaron los archivos del backend (server.py).
+Se subieron las mejoras al repositorio de GitHub.

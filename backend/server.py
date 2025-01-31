@@ -89,6 +89,59 @@ def obtener_miembros():
         print("Error al obtener miembros:", str(e))
         return jsonify({"error": str(e)}), 500
 
+# Ruta para actualizar un registro existente
+@app.route('/editar/<int:id>', methods=['PUT'])
+def editar_membresia(id):
+    try:
+        data = request.get_json()
+        conexion = mysql.connector.connect(**DB_CONFIG)
+        cursor = conexion.cursor()
+        
+        query = """
+        UPDATE membresia 
+        SET nombre_completo = %s, fecha_nacimiento = %s, direccion = %s, telefono = %s, 
+            correo_electronico = %s, tiempo_bautizado = %s, promesado = %s, experiencia_refam = %s
+        WHERE id = %s
+        """
+        valores = (
+            data['nombre_completo'],
+            data['fecha_nacimiento'],
+            data['direccion'],
+            data['telefono'],
+            data['correo_electronico'],
+            data['tiempo_bautizado'],
+            bool(data['promesado']),
+            data['experiencia_refam'],
+            id
+        )
+
+        cursor.execute(query, valores)
+        conexion.commit()
+        cursor.close()
+        conexion.close()
+
+        return jsonify({"mensaje": "Registro actualizado correctamente"}), 200
+
+    except Error as e:
+        return jsonify({"error": str(e)}), 500
+
+# Ruta para eliminar un registro
+@app.route('/eliminar/<int:id>', methods=['DELETE'])
+def eliminar_membresia(id):
+    try:
+        conexion = mysql.connector.connect(**DB_CONFIG)
+        cursor = conexion.cursor()
+        
+        query = "DELETE FROM membresia WHERE id = %s"
+        cursor.execute(query, (id,))
+        conexion.commit()
+        cursor.close()
+        conexion.close()
+
+        return jsonify({"mensaje": "Registro eliminado correctamente"}), 200
+
+    except Error as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-
