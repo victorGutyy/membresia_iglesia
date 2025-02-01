@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const tablaMiembros = document.getElementById("tabla-miembros");
 
     let idEditando = null; // Almacena el ID del registro en edición
+    const API_URL = "http://192.168.1.11:5000"; // Cambia esto si la IP cambia en la red
 
     form.addEventListener("submit", function (event) {
         event.preventDefault(); // Evita el envío del formulario por defecto
@@ -44,11 +45,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (idEditando) {
             // Si hay un ID, actualizamos el registro
-            fetch(`http://192.168.91.226:5000/editar/${idEditando}`, {
+            fetch(`${API_URL}/editar/${idEditando}`, {
                 method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData)
             })
             .then(response => response.json())
@@ -58,32 +57,26 @@ document.addEventListener("DOMContentLoaded", function () {
                 idEditando = null; // Reiniciar el modo edición
                 cargarMiembros();
             })
-            .catch(error => {
-                alert("Error al actualizar el registro: " + error);
-            });
+            .catch(error => alert("Error al actualizar el registro: " + error));
         } else {
             // Si no hay un ID, es un nuevo registro
-            fetch("http://192.168.91.226:5000/registrar", {
+            fetch(`${API_URL}/registrar`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData)
             })
             .then(response => response.json())
             .then(data => {
                 alert(data.mensaje || "Registro exitoso");
                 form.reset();
-                cargarMiembros(); // Recargar la lista de miembros después del registro
+                cargarMiembros();
             })
-            .catch(error => {
-                alert("Error al enviar el formulario: " + error);
-            });
+            .catch(error => alert("Error al enviar el formulario: " + error));
         }
     });
 
     function cargarMiembros() {
-        fetch("http://192.168.91.226:5000/miembros") 
+        fetch(`${API_URL}/miembros`)
         .then(response => response.json())
         .then(data => {
             tablaMiembros.innerHTML = "";
@@ -112,23 +105,21 @@ document.addEventListener("DOMContentLoaded", function () {
     // Función para eliminar un miembro
     window.eliminarMiembro = function (id) {
         if (confirm("¿Estás seguro de que deseas eliminar este registro?")) {
-            fetch(`http://192.168.91.226:5000/eliminar/${id}`, {
+            fetch(`${API_URL}/eliminar/${id}`, {
                 method: "DELETE"
             })
             .then(response => response.json())
             .then(data => {
                 alert(data.mensaje || "Registro eliminado correctamente");
-                cargarMiembros(); // Recargar la tabla después de la eliminación
+                cargarMiembros();
             })
-            .catch(error => {
-                alert("Error al eliminar el registro: " + error);
-            });
+            .catch(error => alert("Error al eliminar el registro: " + error));
         }
     };
 
     // Función para cargar datos en el formulario y editar
     window.editarMiembro = function (id) {
-        fetch(`http://192.168.91.226:5000/miembros`)
+        fetch(`${API_URL}/miembros`)
         .then(response => response.json())
         .then(data => {
             let miembro = data.find(m => m.id === id);
