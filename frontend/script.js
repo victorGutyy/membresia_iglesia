@@ -3,10 +3,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const tablaMiembros = document.getElementById("tabla-miembros");
 
     let idEditando = null; // Almacena el ID del registro en edición
-    const API_URL = "http://192.168.1.11:5000"; // Cambia esto si la IP cambia en la red
+    const API_URL = "http://127.0.0.1:5000"; // Cambia esto si la IP cambia en la red
 
     form.addEventListener("submit", function (event) {
-        event.preventDefault(); // Evita el envío del formulario por defecto
+        event.preventDefault();
 
         let nombre = document.getElementById("nombre_completo").value.trim();
         let fechaNacimiento = document.getElementById("fecha_nacimiento").value;
@@ -17,13 +17,14 @@ document.addEventListener("DOMContentLoaded", function () {
         let promesado = document.getElementById("promesado").value;
         let experienciaRefam = document.getElementById("experiencia_refam").value.trim();
 
+        // Validación de Campos
         if (!nombre || !fechaNacimiento || !direccion || !telefono || !correo || !tiempoBautizado) {
             alert("Por favor, completa todos los campos obligatorios.");
             return;
         }
 
-        if (!/^[\d\+\-\s]+$/.test(telefono)) {
-            alert("El número de teléfono no es válido.");
+        if (!/^\d{10}$/.test(telefono)) {
+            alert("El número de teléfono debe tener 10 dígitos.");
             return;
         }
 
@@ -43,36 +44,22 @@ document.addEventListener("DOMContentLoaded", function () {
             experiencia_refam: experienciaRefam
         };
 
-        if (idEditando) {
-            // Si hay un ID, actualizamos el registro
-            fetch(`${API_URL}/editar/${idEditando}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.mensaje || "Registro actualizado exitosamente");
-                form.reset();
-                idEditando = null; // Reiniciar el modo edición
-                cargarMiembros();
-            })
-            .catch(error => alert("Error al actualizar el registro: " + error));
-        } else {
-            // Si no hay un ID, es un nuevo registro
-            fetch(`${API_URL}/registrar`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.mensaje || "Registro exitoso");
-                form.reset();
-                cargarMiembros();
-            })
-            .catch(error => alert("Error al enviar el formulario: " + error));
-        }
+        const url = idEditando ? `${API_URL}/editar/${idEditando}` : `${API_URL}/registrar`;
+        const method = idEditando ? "PUT" : "POST";
+
+        fetch(url, {
+            method: method,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.mensaje || "Operación exitosa");
+            form.reset();
+            idEditando = null;
+            cargarMiembros();
+        })
+        .catch(error => alert("Error al conectar con el servidor: " + error));
     });
 
     function cargarMiembros() {
@@ -81,28 +68,28 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
             tablaMiembros.innerHTML = "";
             data.forEach(miembro => {
-                let row = `<tr>
-                    <td>${miembro.id}</td>
-                    <td>${miembro.nombre_completo}</td>
-                    <td>${miembro.fecha_nacimiento}</td>
-                    <td>${miembro.direccion}</td>
-                    <td>${miembro.telefono}</td>
-                    <td>${miembro.correo_electronico}</td>
-                    <td>${miembro.tiempo_bautizado}</td>
-                    <td>${miembro.promesado ? "Sí" : "No"}</td>
-                    <td>${miembro.experiencia_refam}</td>
-                    <td>
-                        <button onclick="editarMiembro(${miembro.id})">✏️ Editar</button>
-                        <button onclick="eliminarMiembro(${miembro.id})">🗑️ Eliminar</button>
-                    </td>
-                </tr>`;
+                let row = `
+                    <tr>
+                        <td>${miembro.id}</td>
+                        <td>${miembro.nombre_completo}</td>
+                        <td>${miembro.fecha_nacimiento}</td>
+                        <td>${miembro.direccion}</td>
+                        <td>${miembro.telefono}</td>
+                        <td>${miembro.correo_electronico}</td>
+                        <td>${miembro.tiempo_bautizado}</td>
+                        <td>${miembro.promesado ? "Sí" : "No"}</td>
+                        <td>${miembro.experiencia_refam}</td>
+                        <td>
+                            <button onclick="editarMiembro(${miembro.id})">✏️ Editar</button>
+                            <button onclick="eliminarMiembro(${miembro.id})">🗑️ Eliminar</button>
+                        </td>
+                    </tr>`;
                 tablaMiembros.innerHTML += row;
             });
         })
         .catch(error => console.error("Error al cargar miembros:", error));
     }
 
-    // Función para eliminar un miembro
     window.eliminarMiembro = function (id) {
         if (confirm("¿Estás seguro de que deseas eliminar este registro?")) {
             fetch(`${API_URL}/eliminar/${id}`, {
@@ -117,7 +104,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    // Función para cargar datos en el formulario y editar
     window.editarMiembro = function (id) {
         fetch(`${API_URL}/miembros`)
         .then(response => response.json())
@@ -133,12 +119,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("promesado").value = miembro.promesado ? "true" : "false";
                 document.getElementById("experiencia_refam").value = miembro.experiencia_refam;
                 
-                idEditando = id; // Guardar el ID del registro en edición
+                idEditando = id;
                 alert("Editando registro ID: " + id);
             }
         })
         .catch(error => console.error("Error al obtener datos para edición:", error));
     };
 
-    cargarMiembros(); // Cargar la lista al iniciar la página
+    cargarMiembros();
 });

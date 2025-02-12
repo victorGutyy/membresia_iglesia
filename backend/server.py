@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, session, redirect, url_for
 import mysql.connector
 from mysql.connector import Error
 import json
@@ -11,11 +11,8 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 app = Flask(__name__, static_folder='../frontend')
 CORS(app)  # Habilitar CORS para permitir peticiones desde el frontend
+app.secret_key = 'mi_secreto_seguro'  # Clave secreta para manejar sesiones
 
-# Servir archivos estáticos correctamente
-@app.route('/<path:filename>')
-def static_files(filename):
-    return send_from_directory(app.static_folder, filename)
 
 # Configuración de la conexión a MySQL
 DB_CONFIG = {
@@ -26,19 +23,88 @@ DB_CONFIG = {
     'charset': 'utf8mb4'  # Asegurar codificación UTF-8
 }
 
-# Ruta para servir la página principal
+# Servir archivos estáticos correctamente
+@app.route('/<path:filename>')
+def static_files(filename):
+    return send_from_directory(app.static_folder, filename)
+
+# Ruta para servir la página de inicio de sesión
 @app.route('/')
 def index():
+    if 'usuario' not in session:
+        return send_from_directory(app.static_folder, 'login.html')
     return send_from_directory(app.static_folder, 'index.html')
 
-# Ruta para recibir datos del formulario y guardarlos en MySQL
+# Ruta para servir la página de registro de usuarios
+@app.route('/register.html')
+def register():
+    return send_from_directory(app.static_folder, 'register.html')
+
+# Ruta para registrar un usuario (Administrador)
+@app.route('/registrar_usuario', methods=['POST'])
+def registrar_usuario():
+    try:
+        data = request.get_json()
+        conexion = mysql.connector.connect(**DB_CONFIG)
+        cursor = conexion.cursor()
+        
+        query = "INSERT INTO usuarios (nombre, correo, password) VALUES (%s, %s, %s)"
+        valores = (data['nombre'], data['correo'], data['password'])
+
+        cursor.execute(query, valores)
+        conexion.commit()
+        cursor.close()
+        conexion.close()
+
+        return jsonify({"mensaje": "Usuario registrado correctamente"}), 201
+    except Error as e:
+        return jsonify({"error": str(e)}), 500
+
+# Ruta para inicio de sesión
+@app.route('/login', methods=['POST'])
+def login():
+    try:
+        data = request.get_json()
+        conexion = mysql.connector.connect(**DB_CONFIG)
+        cursor = conexion.cursor(dictionary=True)
+        
+        query = "SELECT * FROM usuarios WHERE correo = %s AND password = %s"
+        cursor.execute(query, (data['correo'], data['password']))
+        usuario = cursor.fetchone()
+
+        cursor.close()
+        conexion.close()
+
+        if usuario:
+            session['usuario'] = usuario['nombre']
+            return jsonify({"mensaje": "Inicio de sesión exitoso"}), 200
+        else:
+            return jsonify({"error": "Credenciales incorrectas"}), 401
+    except Error as e:
+        return jsonify({"error": str(e)}), 500
+
+# Ruta para cerrar sesión
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.pop('usuario', None)
+    return jsonify({"mensaje": "Sesión cerrada"}), 200
+
+# Middleware para proteger rutas
+def login_requerido(f):
+    def wrap(*args, **kwargs):
+        if 'usuario' not in session:
+            return jsonify({"error": "Acceso no autorizado"}), 403
+        return f(*args, **kwargs)
+    wrap.__name__ = f.__name__
+    return wrap
+
+# Ruta para recibir datos del formulario y guardarlos en MySQL (restringido)
 @app.route('/registrar', methods=['POST'])
+@login_requerido
 def registrar_membresia():
     try:
-        data = request.get_json()  # Obtener JSON directamente
-        print("Datos recibidos:", data)
+        data = request.get_json()
 
-        # Verificar si los datos están completos
         required_fields = ['nombre_completo', 'fecha_nacimiento', 'direccion', 'telefono', 'correo_electronico', 'tiempo_bautizado', 'promesado', 'experiencia_refam']
         if not all(field in data for field in required_fields):
             return jsonify({"error": "Faltan datos en la solicitud"}), 400
@@ -57,7 +123,7 @@ def registrar_membresia():
             data['telefono'],
             data['correo_electronico'],
             data['tiempo_bautizado'],
-            bool(data['promesado']),  # Convertir a booleano si es necesario
+            bool(data['promesado']),
             data['experiencia_refam']
         )
 
@@ -66,15 +132,13 @@ def registrar_membresia():
         cursor.close()
         conexion.close()
 
-        print("Registro insertado en MySQL")
         return jsonify({"mensaje": "Registro exitoso"}), 201
-    
     except Error as e:
-        print("Error en MySQL:", str(e))
         return jsonify({"error": str(e)}), 500
 
-# Ruta para obtener la lista de miembros con codificación UTF-8
+# Ruta para obtener la lista de miembros (restringido)
 @app.route('/miembros', methods=['GET'])
+@login_requerido
 def obtener_miembros():
     try:
         conexion = mysql.connector.connect(**DB_CONFIG)
@@ -83,14 +147,13 @@ def obtener_miembros():
         miembros = cursor.fetchall()
         cursor.close()
         conexion.close()
-        print("Datos enviados al frontend:", miembros)
         return jsonify(miembros), 200
     except Error as e:
-        print("Error al obtener miembros:", str(e))
         return jsonify({"error": str(e)}), 500
 
-# Ruta para actualizar un registro existente
+# Ruta para actualizar un registro existente (restringido)
 @app.route('/editar/<int:id>', methods=['PUT'])
+@login_requerido
 def editar_membresia(id):
     try:
         data = request.get_json()
@@ -125,8 +188,9 @@ def editar_membresia(id):
     except Error as e:
         return jsonify({"error": str(e)}), 500
 
-# Ruta para eliminar un registro
+# Ruta para eliminar un registro (restringido)
 @app.route('/eliminar/<int:id>', methods=['DELETE'])
+@login_requerido
 def eliminar_membresia(id):
     try:
         conexion = mysql.connector.connect(**DB_CONFIG)
@@ -139,7 +203,6 @@ def eliminar_membresia(id):
         conexion.close()
 
         return jsonify({"mensaje": "Registro eliminado correctamente"}), 200
-
     except Error as e:
         return jsonify({"error": str(e)}), 500
 
