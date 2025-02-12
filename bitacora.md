@@ -85,3 +85,46 @@ Se validó que los registros se almacenan correctamente en la base de datos y se
 Se actualizaron los archivos del frontend (index.html, styles.css, script.js).
 Se actualizaron los archivos del backend (server.py).
 Se subieron las mejoras al repositorio de GitHub.
+
+📅 Bitácora - [Fecha de Hoy]
+📌 Proyecto: Membresía Iglesia
+👨‍💻 Desarrollador: [Tu Nombre]
+
+✅ Tareas Realizadas
+Implementación de página de inicio de sesión (Login)
+
+Se creó el archivo login.html con un formulario de autenticación.
+Se agregó validación y conexión con el backend a través de login.js.
+Se integró el inicio de sesión en server.py, con validación de credenciales en la base de datos.
+Creación de página de registro de usuarios
+
+Se creó register.html para permitir la creación de nuevos usuarios.
+Se implementó register.js para gestionar la petición de registro en el backend.
+Se actualizó server.py para manejar el registro de usuarios en MySQL.
+Corrección de errores en la base de datos
+
+Se corrigió el nombre de la columna contraseña en la tabla usuarios a password para evitar errores en las consultas.
+Se verificó la estructura de la base de datos en MySQL Workbench.
+Seguridad y restricción de acceso
+
+Se implementó manejo de sesiones en Flask para restringir el acceso a la página de membresía.
+Se protegieron las rutas en server.py con validación de sesión.
+Se agregó la funcionalidad de cerrar sesión (logout).
+Corrección de conexión entre el frontend y backend
+
+Se ajustó script.js para usar la IP correcta del servidor (127.0.0.1:5000).
+Se verificó la ejecución del servidor Flask y la conectividad con MySQL.
+Pruebas y despliegue en el entorno local
+
+Se realizaron pruebas de login, registro de usuarios y redirección.
+Se probó el registro de membresía y consulta de datos en la base de datos.
+Se resolvió un error de conexión con fetch() al registrar miembros.
+Subida del proyecto a GitHub
+
+Se añadieron y confirmaron los cambios (git add . y git commit -m "Actualización").
+Se subió el código al repositorio con git push origin main.
+🚀 Próximos Pasos
+🔹 Optimizar la UI/UX de las páginas de login y registro.
+🔹 Implementar recuperación de contraseña.
+🔹 Considerar la compra de un dominio y hosting para desplegar el proyecto.
+🔹 Configurar despliegue en un servidor externo (Heroku, DigitalOcean o similar).
