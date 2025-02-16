@@ -92,7 +92,10 @@ def registrar_membresia():
             data['correo_electronico'],
             data['tiempo_bautizado'],
             bool(data['promesado']),
-            data['experiencia_refam']
+            data['experiencia_refam'],
+            data['donde_estas_dando_refam'],
+            data['nivel_y_clase']
+            
         )
 
         cursor.execute(query, valores)
@@ -131,7 +134,7 @@ def editar_membresia(id):
         query = """
         UPDATE membresia 
         SET nombre_completo = %s, fecha_nacimiento = %s, direccion = %s, telefono = %s, 
-            correo_electronico = %s, tiempo_bautizado = %s, promesado = %s, experiencia_refam = %s
+            correo_electronico = %s, tiempo_bautizado = %s, promesado = %s, experiencia_refam = %s, donde_estas_dando_refam = %s, nivel_y_clase = %s
         WHERE id = %s
         """
         valores = (
@@ -143,6 +146,8 @@ def editar_membresia(id):
             data['tiempo_bautizado'],
             bool(data['promesado']),
             data['experiencia_refam'],
+            data['donde_estas_dando_refam'],
+            data['nivel_y_clase'],
             id
         )
 

@@ -16,9 +16,11 @@ document.addEventListener("DOMContentLoaded", function () {
         let tiempoBautizado = document.getElementById("tiempo_bautizado").value.trim();
         let promesado = document.getElementById("promesado").value;
         let experienciaRefam = document.getElementById("experiencia_refam").value.trim();
+        let dondeEstasDandoRefam = document.getElementById("donde_estas_dando_refam").value.trim();
+        let nivelYClase = document.getElementById("nivel_y_clase").value.trim();
 
         // Validación de Campos
-        if (!nombre || !fechaNacimiento || !direccion || !telefono || !correo || !tiempoBautizado) {
+        if (!nombre || !fechaNacimiento || !direccion || !telefono || !correo || !tiempoBautizado || !experienciaRefam  || !dondeEstasDandoRefam || !nivelYClase) {
             alert("Por favor, completa todos los campos obligatorios.");
             return;
         }
@@ -41,7 +43,9 @@ document.addEventListener("DOMContentLoaded", function () {
             correo_electronico: correo,
             tiempo_bautizado: tiempoBautizado,
             promesado: promesado,
-            experiencia_refam: experienciaRefam
+            experiencia_refam: experienciaRefam,
+            donde_estas_dando_refam: dondeEstasDandoRefam,
+            nivel_y_clase: nivelYClase
         };
 
         const url = idEditando ? `${API_URL}/editar/${idEditando}` : `${API_URL}/registrar`;
@@ -79,6 +83,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         <td>${miembro.tiempo_bautizado}</td>
                         <td>${miembro.promesado ? "Sí" : "No"}</td>
                         <td>${miembro.experiencia_refam}</td>
+                        <td>${miembro.donde_estas_dando_refam}</td>
+                        <td>${miembro.nivel_y_clase}</td>
                         <td>
                             <button onclick="editarMiembro(${miembro.id})">✏️ Editar</button>
                             <button onclick="eliminarMiembro(${miembro.id})">🗑️ Eliminar</button>
@@ -118,6 +124,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("tiempo_bautizado").value = miembro.tiempo_bautizado;
                 document.getElementById("promesado").value = miembro.promesado ? "true" : "false";
                 document.getElementById("experiencia_refam").value = miembro.experiencia_refam;
+                document.getElementById("donde_estas_dando_refam").value = miembro.donde_estas_dando_refam;
+                document.getElementById("nivel_y_clase").value = miembro.nivel_y_clase;
                 
                 idEditando = id;
                 alert("Editando registro ID: " + id);
