@@ -1,10 +1,8 @@
-from flask import Flask, request, jsonify, send_from_directory, session, redirect, url_for
+from flask import Flask, request, jsonify, send_from_directory, session
 import mysql.connector
 from mysql.connector import Error
-import json
 import sys
 from flask_cors import CORS
-import os  # Para manejar rutas de archivos
 
 # Asegurar que todo maneje UTF-8
 sys.stdout.reconfigure(encoding='utf-8')
@@ -13,6 +11,9 @@ app = Flask(__name__, static_folder='../frontend')
 CORS(app)  # Habilitar CORS para permitir peticiones desde el frontend
 app.secret_key = 'mi_secreto_seguro'  # Clave secreta para manejar sesiones
 
+# Usuario y contraseña únicos
+USUARIO_UNICO = "refamipuc4calarca@gmail.com"
+PASSWORD_UNICO = "refam2025"
 
 # Configuración de la conexión a MySQL
 DB_CONFIG = {
@@ -20,7 +21,7 @@ DB_CONFIG = {
     'user': 'root',
     'password': '042485',
     'database': 'iglesia',
-    'charset': 'utf8mb4'  # Asegurar codificación UTF-8
+    'charset': 'utf8mb4'
 }
 
 # Servir archivos estáticos correctamente
@@ -35,52 +36,20 @@ def index():
         return send_from_directory(app.static_folder, 'login.html')
     return send_from_directory(app.static_folder, 'index.html')
 
-# Ruta para servir la página de registro de usuarios
-@app.route('/register.html')
-def register():
-    return send_from_directory(app.static_folder, 'register.html')
-
-# Ruta para registrar un usuario (Administrador)
-@app.route('/registrar_usuario', methods=['POST'])
-def registrar_usuario():
-    try:
-        data = request.get_json()
-        conexion = mysql.connector.connect(**DB_CONFIG)
-        cursor = conexion.cursor()
-        
-        query = "INSERT INTO usuarios (nombre, correo, password) VALUES (%s, %s, %s)"
-        valores = (data['nombre'], data['correo'], data['password'])
-
-        cursor.execute(query, valores)
-        conexion.commit()
-        cursor.close()
-        conexion.close()
-
-        return jsonify({"mensaje": "Usuario registrado correctamente"}), 201
-    except Error as e:
-        return jsonify({"error": str(e)}), 500
-
-# Ruta para inicio de sesión
+# Ruta para inicio de sesión con usuario único
 @app.route('/login', methods=['POST'])
 def login():
     try:
         data = request.get_json()
-        conexion = mysql.connector.connect(**DB_CONFIG)
-        cursor = conexion.cursor(dictionary=True)
-        
-        query = "SELECT * FROM usuarios WHERE correo = %s AND password = %s"
-        cursor.execute(query, (data['correo'], data['password']))
-        usuario = cursor.fetchone()
+        correo = data.get('correo')
+        password = data.get('password')
 
-        cursor.close()
-        conexion.close()
-
-        if usuario:
-            session['usuario'] = usuario['nombre']
+        if correo == USUARIO_UNICO and password == PASSWORD_UNICO:
+            session['usuario'] = correo
             return jsonify({"mensaje": "Inicio de sesión exitoso"}), 200
         else:
             return jsonify({"error": "Credenciales incorrectas"}), 401
-    except Error as e:
+    except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 # Ruta para cerrar sesión
@@ -104,7 +73,6 @@ def login_requerido(f):
 def registrar_membresia():
     try:
         data = request.get_json()
-
         required_fields = ['nombre_completo', 'fecha_nacimiento', 'direccion', 'telefono', 'correo_electronico', 'tiempo_bautizado', 'promesado', 'experiencia_refam']
         if not all(field in data for field in required_fields):
             return jsonify({"error": "Faltan datos en la solicitud"}), 400
